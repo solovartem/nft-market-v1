@@ -1,0 +1,31 @@
+name: Build and Deploy
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2.3.1
+
+      - name: Cache node modules ❄️
+        uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install ⚡️
+        run: yarn install
+
+      - name: Install and Build 🔧
+        env:
+          REACT_APP_SERVICE_URL: ${{ secrets.REACT_APP_SERVICE_URL }}
+          REACT_APP_RPC_URL_1: ${{ secrets.REACT_APP_RPC_URL_1 }}
+          REACT_APP_RPC_URL_4: ${{ secrets.REACT_APP_RPC_URL_4 }}
+        run: yarn build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.1
+        with:
+          branch: gh-pages 
+          folder: build 
